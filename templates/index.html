@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+</head>
+
+<body>
+    <h1>Players</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>FIDE Id</th>
+                <th>Name</th>
+                <th>Nationality</th>
+                <th>Rating</th>
+                <th>Birth Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.fide_id }}</td>
+                <td>
+                    <a href="/{{ row.name }}">
+                        {{ row.name }}
+                    </a>
+                </td>
+                <td>{{ row.nationality }}</td>
+                <td>{{ row.max_rating }}</td>
+                <td>{{ row.born }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .player-info {
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+
+
+        .nav-menu {
+
+
+            padding: 0;
+        }
+
+        .player-info ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            background-color: aqua;
+            color: #2E8B57;
+            font-size: 20px;
+            font-weight: 500;
+            gap: 50px;
+            padding: 0;
+        }
+
+        .player-info li {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .player-info li strong {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .result-win {
+            color: green;
+            font-weight: bold;
+        }
+
+        .result-loss {
+            color: red;
+            font-weight: bold;
+        }
+
+        #val {
+            display: block;
+            margin-top: 0.5em;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="player-info">
+        <ul>
+            <li> {{ data[0][3] }}</li>
+            <li> {{ data[0][4] }}</li>
+            <li> {{ data[0][5] }}</li>
+            <li>{{ data[0][6] }}y {{ data[0][7] }}m</li>
+            <li></li>
+            <li></li>
+        </ul>
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th colspan="3">Tournament Name</th>
+                    <th>{{ data[0][3] }}</th>
+                    <th>{{ data[0][4] }}</th>
+                    <th>{{ data[0][5] }}</th>
+                    <th>{{ data[0][6] }}y {{ data[0][7] }}m</th>
+                    <th id="final"></th>
+                    <th id="change"></th>
+                </tr>
+            </thead>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Round</th>
+                    <th>Color</th>
+                    <th>Player</th>
+                    <th>Nationality</th>
+                    <th>Rating</th>
+                    <th>Age</th>
+                    <th>Result</th>
+                    <th>FIDE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[15] }}</td>
+                    <td>{{ row[9] }}</td>
+                    <td>{{ row[10] }}</td>
+                    <td>{{ row[11] }}</td>
+                    <td>{{ row[12] }}y {{ row[13] }}m</td>
+                    <td class="{% if row[14] == '1-0' %}result-win{% elif row[14] == '0-1' %}result-loss{% endif %}">{{
+                        row[14] }}</td>
+                    <td class="count-me">{{ row[16] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                updateSubTotal(); // Initial call
+
+                function updateSubTotal() {
+                    const table = document.getElementById("myTable");
+                    const totalGames = Array.from(table.rows).length - 2;
+                    const totalPoints = Array.from(table.rows).slice(2).reduce((total, row) => {
+                        let point = 0;
+                        if (row.cells[7].innerHTML === '1-0') {
+                            point++
+                        } else if (row.cells[7].innerHTML === '½-½') {
+                            point += 0.5;
+                        }
+                        return total + point;
+                    }, 0);
+                    let subTotal = Array.from(table.rows).slice(2).reduce((total, row) => {
+                        return total + parseFloat(row.cells[8].innerHTML);
+                    }, 0);
+                    document.getElementById("final").innerHTML = totalPoints + ' / ' + totalGames;
+                    document.getElementById("change").innerHTML = subTotal.toFixed(2);
+                }
+            });
+        </script>
+</body>
+
+</html>
