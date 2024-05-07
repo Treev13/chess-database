@@ -38,13 +38,13 @@ def format_matches(name, id, data, cursor):
     mod_data = []
     periods = get_rating_list_periods(cursor)
     event = get_event_by_id(id, cursor)
+    print(event)
     for row in data:
-        period = check_latest_rating_list(row['date'], periods)
+        period = check_latest_rating_list(event['start_date'], periods)
         row['w_rating'] = (get_rating(period, row['w_fide_id'], cursor))
         row['b_rating'] = (get_rating(period, row['b_fide_id'], cursor))
         if row['w_name'] != name:
-            print(row)
-            # swapping by indices
+            
             row['w_fide_id'], row['b_fide_id'] = row['b_fide_id'], row['w_fide_id']
             row['w_name'], row['b_name'] = row['b_name'], row['w_name']
             row['w_nat'], row['b_nat'] = row['b_nat'], row['w_nat']
@@ -60,6 +60,7 @@ def format_matches(name, id, data, cursor):
             
         else: row['color'] = ('w')
         row['rat_change'] = (calculate_fide(row['w_rating'], row['b_rating'], row['result']))
+        row['event'] = event['event_name']
         mod_data.append(row)
     return mod_data
 
