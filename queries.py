@@ -31,6 +31,38 @@ MATCHES_BY_PLAYER_AND_EVENT = '''
                     ORDER BY m.date;
                 '''
 
+RESULT_BY_EVENT = '''SELECT fide_id, player, nat, year, month, SUM(points) AS points, SUM(games) AS games
+                    FROM(
+                    SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
+                        EXTRACT(YEAR FROM (age(e.start_date, p.born)) ) as year,
+                        EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
+                        SUM(CASE WHEN result = '1-0' THEN 1 
+                                 WHEN result = '½-½' THEN 0.5
+                                 ELSE 0 END) AS points,
+                        COUNT(*) AS games
+                    FROM matches m
+                    JOIN players_new p ON m.white = p.fide_id
+                    JOIN events e ON m.event = e.event_id
+                    WHERE event = (%s)
+                    GROUP BY fide_id, player, nat, year, month
+                    UNION ALL
+                    SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
+                        EXTRACT(YEAR FROM (age(start_date, p.born)) ) as year,
+                        EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
+                        SUM(CASE WHEN result = '0-1' THEN 1
+                                 WHEN result = '½-½' THEN 0.5
+                                 ELSE 0 END) AS points,
+                        COUNT(*) AS games
+                    FROM matches m
+                    JOIN players_new p ON m.black = p.fide_id
+                    JOIN events e ON m.event = e.event_id
+                    WHERE event = (%s)
+                    GROUP BY fide_id, black, nat, year, month
+                    ) AS sub
+                    GROUP BY fide_id, player, nat, year, month
+                    ORDER BY points DESC;
+                    '''
+
 PLAYERS = '''
             SELECT p.fide_id, p.name, p.nationality, mr.max_rating, p.born
             FROM players_new AS p
@@ -58,6 +90,22 @@ EVENT_BY_ID = '''
                 SELECT * FROM events
                 WHERE event_id = (%s)
                 '''
+
+RESULT_BYY_EVENT = """
+                    select tour.id as id, tour.name as name, site, tour.start_date, tour.end_date,
+                        extract(year from age(tour.start_date,players.born)) as years,
+                        extract(month from age(tour.start_date,players.born)) as months,
+                        elo,
+                        sum(result) as points,
+                        count(*) as games,
+                        round( avg(o_elo + 800 * result - 400) ) as performance
+                    FROM matches
+                        inner join tournaments tour on tour.short_name = matches.event
+                        inner join players on players.name = matches.player
+                        where players.id = ?
+                        group by player,event,elo,years,months,tour.id, tour.name, site, start_date, end_date
+                    order by start_date
+                    """
 
 IMPORT_CSV = '''
             TRUNCATE matches_old;

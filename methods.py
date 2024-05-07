@@ -1,5 +1,5 @@
-from datetime import date, timedelta
-from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID
+from datetime import timedelta
+from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID, RESULT_BY_EVENT
 from fide_calculator import fide_calculator
 
 def check_latest_rating_list(match_date, periods):
@@ -38,9 +38,8 @@ def format_matches(name, id, data, cursor):
     mod_data = []
     periods = get_rating_list_periods(cursor)
     event = get_event_by_id(id, cursor)
-    print(event)
+    period = check_latest_rating_list(event['start_date'], periods)
     for row in data:
-        period = check_latest_rating_list(event['start_date'], periods)
         row['w_rating'] = (get_rating(period, row['w_fide_id'], cursor))
         row['b_rating'] = (get_rating(period, row['b_fide_id'], cursor))
         if row['w_name'] != name:
@@ -65,6 +64,17 @@ def format_matches(name, id, data, cursor):
         mod_data.append(row)
     return mod_data
 
+def get_results_by_event(id, cursor):
+    result = []
+    event = get_event_by_id(id, cursor)
+    result = calculate_result(id, cursor)
+    return result
+
+def calculate_result(id, cursor):
+    cursor.execute(RESULT_BY_EVENT, (id, id))
+    return cursor.fetchall()
+    
+
 def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
     elvart = fide_calculator(diff)
@@ -76,6 +86,10 @@ def calculate_fide(p_rat, o_rat, result):
 
 def get_events_by_player(name, cursor):
     cursor.execute(EVENTS_BY_PLAYER, (name, name))
+    return cursor.fetchall()
+
+def get_matches_by_event(id, cursor):
+    cursor.execute(MATCHES_BY_EVENT, (id,))
     return cursor.fetchall()
 
 def get_event_by_id(id, cursor):
