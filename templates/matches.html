@@ -8,14 +8,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: #009B4D;
             margin: 0;
             padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
         }
 
         .player-info {
@@ -26,63 +21,44 @@
             margin-bottom: 20px;
         }
 
-
-
-        .nav-menu {
-
-
-            padding: 0;
-        }
-
-        .player-info ul {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            list-style: none;
-            background-color: aqua;
-            color: #2E8B57;
-            font-size: 20px;
-            font-weight: 500;
-            gap: 50px;
-            padding: 0;
-        }
-
-        .player-info li {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            cursor: pointer;
-            margin-bottom: 5px;
-        }
-
-        .player-info li strong {
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
         table {
-            width: 100%;
+            width: 90%;
             border-collapse: collapse;
-            border: 1px solid #ddd;
-            background-color: #fff;
+            border: 2px solid #FAF5E9;
+            border-radius: 8px;
+            margin: 10px auto;
+            background-color: #009B4D;
+        }
+        .stat th{
+            background-color: #FFCC00;
+            color: #009B4D;
+            font-weight: bolder;
         }
 
         th,
         td {
-            padding: 10px;
+            color: #FAF5E9;
+            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #FAF5E9;
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #009B4D;
+            font-weight: bold;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        thead {
+            background-color: #009B4D;
+            font-weight: bold;
+            border: 2px solid #FAF5E9;
         }
+
+
+        tr:nth-child(odd) {
+            background-color: #03b35b;
+        }
+
 
         .result-win {
             color: green;
@@ -94,27 +70,16 @@
             font-weight: bold;
         }
 
-        #val {
-            display: block;
-            margin-top: 0.5em;
-        }
     </style>
 
 </head>
 
 <body>
     <div class="player-info">
-        <ul>
-            <li> {{ data[0][3] }}</li>
-            <li> {{ data[0][4] }}</li>
-            <li> {{ data[0][5] }}</li>
-            <li>{{ data[0][6] }}y {{ data[0][7] }}m</li>
-            <li></li>
-            <li></li>
-        </ul>
+        
         <table id="myTable">
             <thead>
-                <tr>
+                <tr class="stat">
                     <th colspan="3">Tournament Name</th>
                     <th>{{ data[0][3] }}</th>
                     <th>{{ data[0][4] }}</th>

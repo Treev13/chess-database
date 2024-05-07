@@ -7,46 +7,63 @@
     <title>Matches</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Times New Roman', Times, serif;
+            
         }
-
+        
         .container {
+            background-image: url('./background.jpg');
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
 
+        h1 {
+
+            color: #FFCC00;
+        }
+
         .events-table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #fff;
+            border: 2px solid #FAF5E9;
+            background-color: #009B4D;
         }
 
         .events-table th,
         .events-table td {
+            color: #FAF5E9;
             padding: 8px;
-            border: 1px solid #ddd;
+            text-align: left;
+            border-bottom: 1px solid #FAF5E9;
         }
 
         .events-table th {
-            background-color: #007bff;
-            color: #fff;
+            background-color: #009B4D;
             font-weight: bold;
-            text-align: left;
+        }
+
+        thead {
+            
+            border: 2px solid #FAF5E9;
         }
 
         .event-date {
             width: 100px;
         }
 
-        .event-name a {
-            color: #007bff;
-            text-decoration: none;
+        tr:nth-child(odd) {
+            background-color: #03b35b;
         }
 
-        .event-name a:hover {
-            text-decoration: underline;
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #FFCC00;
+        }
+
+        a:hover {
+            color: #ffcc00b6;
         }
     </style>
 
