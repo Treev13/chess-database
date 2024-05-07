@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            background-color: #009B4D;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            padding-top: 3%;
+            padding-left: 5%;
+            color: #FFCC00;
+        }
+
+        table {
+            width: 95%;
+            border-collapse: collapse;
+            border: 2px solid #FAF5E9;
+            border-radius: 8px;
+            margin: 10px auto;
+            background-color: #009B4D;
+        }
+
+        th,
+        td {
+            color: #FAF5E9;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #FAF5E9;
+        }
+
+        th {
+            background-color: #009B4D;
+            font-weight: bold;
+        }
+
+        thead {
+            background-color: #009B4D;
+            font-weight: bold;
+            border: 2px solid #FAF5E9;
+        }
+
+
+        tr:nth-child(odd) {
+            background-color: #03b35b;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #FFCC00;
+        }
+
+        a:hover {
+            color: #ffcc00b6;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>FIDE Id</th>
+                <th>Name</th>
+                <th>Fed</th>
+                <th>Age</th>
+                <th>Points</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.fide_id }}</td>
+                <td>{{ result.player }}</td>
+                <td>{{ result.nat }}</td>
+                <td>{{ result.year }}y{{ result.month }}m</td>
+                <td>{{ result.points }}</td>
+                <td>{{ result.games }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
