@@ -15,13 +15,13 @@ def check_latest_rating_list(match_date, periods):
 
 def get_rating_list_periods(cursor):
     cursor.execute('''
-                SELECT DISTINCT period
+                SELECT DISTINCT period as period
                 FROM ratings
                 ''')
     data = cursor.fetchall()
     dates = []
     for row in data:
-        dates.append(row[0])
+        dates.append(row['period'])
     return dates
 
 def get_rating (period, fide_id, cursor):
@@ -31,40 +31,41 @@ def get_rating (period, fide_id, cursor):
                 WHERE period = (%s)
                     AND fide_id = (%s)
                 ''', (period, fide_id)) 
-    data = cursor.fetchone() 
-    return data[0]
+    rating = cursor.fetchone()
+    return rating['rating']
 
 def format_matches(name, id, data, cursor):
     mod_data = []
     periods = get_rating_list_periods(cursor)
     event = get_event_by_id(id, cursor)
-    print(event)
-    for tup in data:
-        row = list(tup)
-        period = check_latest_rating_list(row[0], periods)
-        row.insert(5, get_rating(period, row[2], cursor))
-        row.insert(11, get_rating(period, row[8], cursor))
-        if row[3] != name:
-            temp = (row[2:8])
-            row[2:8] = row[8:14]
-            row[8:14] = temp
-            if row[14] == '1-0':
-                row[14] = '0-1'
-            elif row[14] == '0-1':
-                row[14] = '1-0'
-            row.append('b')
-        else: row.append('w')
-        row.append(calculate_fide(row[5], row[11], row[14]))
-        mod_data.append(tuple(row))
+    for row in data:
+        period = check_latest_rating_list(row['date'], periods)
+        row['w_rating'] = (get_rating(period, row['w_fide_id'], cursor))
+        row['b_rating'] = (get_rating(period, row['b_fide_id'], cursor))
+        if row['w_name'] != name:
+            print(row)
+            # swapping by indices
+            row['w_fide_id'], row['b_fide_id'] = row['b_fide_id'], row['w_fide_id']
+            row['w_name'], row['b_name'] = row['b_name'], row['w_name']
+            row['w_nat'], row['b_nat'] = row['b_nat'], row['w_nat']
+            row['w_rating'], row['b_rating'] = row['b_rating'], row['w_rating']
+            row['w_year'], row['b_year'] = row['b_year'], row['w_year']
+            row['w_month'], row['b_month'] = row['b_month'], row['w_month']
+            
+            if row['result'] == '1-0':
+                row['result'] = '0-1'
+            elif row['result'] == '0-1':
+                row['result'] = '1-0'
+            row['color'] = ('b')
+            
+        else: row['color'] = ('w')
+        row['rat_change'] = (calculate_fide(row['w_rating'], row['b_rating'], row['result']))
+        mod_data.append(row)
     return mod_data
-
-
 
 def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
     elvart = fide_calculator(diff)
-    print(p_rat, o_rat, elvart)
-    real = 0
     if result == '1-0': real = 1
     elif result == '0-1': real = 0
     else: real = 0.5

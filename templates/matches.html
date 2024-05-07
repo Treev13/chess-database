@@ -81,10 +81,10 @@
             <thead>
                 <tr class="stat">
                     <th colspan="3">Tournament Name</th>
-                    <th>{{ data[0][3] }}</th>
-                    <th>{{ data[0][4] }}</th>
-                    <th>{{ data[0][5] }}</th>
-                    <th>{{ data[0][6] }}y {{ data[0][7] }}m</th>
+                    <th>{{ data[0]['w_name'] }}</th>
+                    <th>{{ data[0]['w_nat'] }}</th>
+                    <th>{{ data[0]['w_rating'] }}</th>
+                    <th>{{ data[0]['w_year'] }}y {{ data[0]['w_month'] }}m</th>
                     <th id="final"></th>
                     <th id="change"></th>
                 </tr>
@@ -105,16 +105,16 @@
             <tbody>
                 {% for row in data %}
                 <tr>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[15] }}</td>
-                    <td>{{ row[9] }}</td>
-                    <td>{{ row[10] }}</td>
-                    <td>{{ row[11] }}</td>
-                    <td>{{ row[12] }}y {{ row[13] }}m</td>
-                    <td class="{% if row[14] == '1-0' %}result-win{% elif row[14] == '0-1' %}result-loss{% endif %}">{{
-                        row[14] }}</td>
-                    <td class="count-me">{{ row[16] }}</td>
+                    <td>{{ row['date'] }}</td>
+                    <td>{{ row['round'] }}</td>
+                    <td>{{ row['color'] }}</td>
+                    <td>{{ row['b_name'] }}</td>
+                    <td>{{ row['b_nat'] }}</td>
+                    <td>{{ row['b_rating'] }}</td>
+                    <td>{{ row['b_year'] }}y {{ row['b_month'] }}m</td>
+                    <td class="{% if row['result'] == '1-0' %}result-win{% elif row['result'] == '0-1' %}result-loss{% endif %}">{{
+                        row['result'] }}</td>
+                    <td class="count-me">{{ row['rat_change'] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

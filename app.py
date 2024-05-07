@@ -38,7 +38,7 @@ def get_players ():
 @app.get('/<name>')
 def events_by_player (name):
     with connection:
-        with connection.cursor() as cursor:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             events = get_events_by_player(name, cursor)
 
     return render_template('events_by_player.html', name=name, events=events)
@@ -46,10 +46,11 @@ def events_by_player (name):
 @app.get('/<name>/<id>')
 def matches (name, id):
     with connection:
-        with connection.cursor() as cursor:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(MATCHES_BY_PLAYER_AND_EVENT,(name, name, id)) 
             data = cursor.fetchall()
             mod_data = format_matches(name, id, data, cursor)
+            print(mod_data)
     return render_template('matches.html', data=mod_data)
 
 @app.get('/upload')

@@ -45,7 +45,7 @@ PLAYERS = '''
 
 
 EVENTS_BY_PLAYER = '''
-                    SELECT distinct e.event_id, e.start_date, e.event_name, e.event_site
+                    SELECT distinct e.event_id as id, e.start_date as start, e.event_name as name, e.event_site as site
                     FROM matches m
                     JOIN events e on e.event_id = m.event
                     JOIN players_new w on w.fide_id = m.white

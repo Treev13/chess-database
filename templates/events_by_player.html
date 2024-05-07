@@ -82,9 +82,9 @@
             <tbody>
                 {% for event in events %}
                 <tr class="event">
-                    <td class="event-date">{{ event[1] }}</td>
-                    <td class="event-name"><a href="{{ name }}/{{ event[0] }}">{{ event[2] }}</a></td>
-                    <td>{{ event[3] }}</td>
+                    <td class="event-date">{{ event.start }}</td>
+                    <td class="event-name"><a href="{{ name }}/{{ event.id }}">{{ event.name }}</a></td>
+                    <td>{{ event.site }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
