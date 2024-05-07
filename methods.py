@@ -44,7 +44,7 @@ def format_matches(name, id, data, cursor):
         row['w_rating'] = (get_rating(period, row['w_fide_id'], cursor))
         row['b_rating'] = (get_rating(period, row['b_fide_id'], cursor))
         if row['w_name'] != name:
-            
+
             row['w_fide_id'], row['b_fide_id'] = row['b_fide_id'], row['w_fide_id']
             row['w_name'], row['b_name'] = row['b_name'], row['w_name']
             row['w_nat'], row['b_nat'] = row['b_nat'], row['w_nat']
@@ -60,7 +60,8 @@ def format_matches(name, id, data, cursor):
             
         else: row['color'] = ('w')
         row['rat_change'] = (calculate_fide(row['w_rating'], row['b_rating'], row['result']))
-        row['event'] = event['event_name']
+        row['event_id'] = event['event_id']
+        row['event_name'] = event['event_name']
         mod_data.append(row)
     return mod_data
 

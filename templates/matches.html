@@ -80,7 +80,7 @@
         <table id="myTable">
             <thead>
                 <tr class="stat">
-                    <th colspan="3">{{ data[0]['event'] }}</th>
+                    <th colspan="3"><a href="/{{ data[0]['event_id'] }}">{{ data[0]['event_name'] }}</a></th>
                     <th>{{ data[0]['w_name'] }}</th>
                     <th>{{ data[0]['w_nat'] }}</th>
                     <th>{{ data[0]['w_rating'] }}</th>
@@ -108,7 +108,7 @@
                     <td>{{ row['date'] }}</td>
                     <td>{{ row['round'] }}</td>
                     <td>{{ row['color'] }}</td>
-                    <td>{{ row['b_name'] }}</td>
+                    <td><a href="/{{ row['b_name'] }}/{{ row['event_id'] }}">{{ row['b_name'] }}</a></td>
                     <td>{{ row['b_nat'] }}</td>
                     <td>{{ row['b_rating'] }}</td>
                     <td>{{ row['b_year'] }}y {{ row['b_month'] }}m</td>
