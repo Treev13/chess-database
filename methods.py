@@ -65,9 +65,12 @@ def format_matches(name, id, data, cursor):
     return mod_data
 
 def get_results_by_event(id, cursor):
-    result = []
+    periods = get_rating_list_periods(cursor)
     event = get_event_by_id(id, cursor)
+    period = check_latest_rating_list(event['start_date'], periods)
     result = calculate_result(id, cursor)
+    for row in result:
+        row['rating'] = get_rating(period, row['fide_id'], cursor)
     return result
 
 def calculate_result(id, cursor):
@@ -86,10 +89,6 @@ def calculate_fide(p_rat, o_rat, result):
 
 def get_events_by_player(name, cursor):
     cursor.execute(EVENTS_BY_PLAYER, (name, name))
-    return cursor.fetchall()
-
-def get_matches_by_event(id, cursor):
-    cursor.execute(MATCHES_BY_EVENT, (id,))
     return cursor.fetchall()
 
 def get_event_by_id(id, cursor):

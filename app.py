@@ -57,7 +57,6 @@ def matches (name, id):
             cursor.execute(MATCHES_BY_PLAYER_AND_EVENT,(name, name, id)) 
             data = cursor.fetchall()
             mod_data = format_matches(name, id, data, cursor)
-            print(mod_data)
     return render_template('matches.html', data=mod_data)
 
 @app.get('/upload')

@@ -29,10 +29,21 @@
             margin: 10px auto;
             background-color: #009B4D;
         }
-        .stat th{
+
+        .stat th {
             background-color: #FFCC00;
             color: #009B4D;
             font-weight: bolder;
+        }
+
+        .stat a {
+            text-decoration: none;
+            font-weight: bolder;
+            color: #009B4D;
+        }
+
+        .stat a:hover {
+            color: #009b4e69;
         }
 
         th,
@@ -59,6 +70,15 @@
             background-color: #03b35b;
         }
 
+        tbody a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #FFCC00;
+        }
+
+        tbody a:hover {
+            color: #ffcc00b6;
+        }
 
         .result-win {
             color: green;
@@ -69,14 +89,13 @@
             color: red;
             font-weight: bold;
         }
-
     </style>
 
 </head>
 
 <body>
     <div class="player-info">
-        
+
         <table id="myTable">
             <thead>
                 <tr class="stat">
@@ -112,7 +131,9 @@
                     <td>{{ row['b_nat'] }}</td>
                     <td>{{ row['b_rating'] }}</td>
                     <td>{{ row['b_year'] }}y {{ row['b_month'] }}m</td>
-                    <td class="{% if row['result'] == '1-0' %}result-win{% elif row['result'] == '0-1' %}result-loss{% endif %}">{{
+                    <td
+                        class="{% if row['result'] == '1-0' %}result-win{% elif row['result'] == '0-1' %}result-loss{% endif %}">
+                        {{
                         row['result'] }}</td>
                     <td class="count-me">{{ row['rat_change'] }}</td>
                 </tr>

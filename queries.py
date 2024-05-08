@@ -11,7 +11,7 @@ MATCHES_BY_PLAYER = '''
                     JOIN players_new w ON m.white = w.fide_id
                     JOIN players_new b ON m.black = b.fide_id
                     JOIN events e ON e.event_id = m.event
-                    WHERE w.name like (%s) or b.name like (%s)
+                    WHERE w.name = (%s) or b.name = (%s)
                     ORDER BY m.date;
                 '''
 MATCHES_BY_PLAYER_AND_EVENT = '''
@@ -31,34 +31,37 @@ MATCHES_BY_PLAYER_AND_EVENT = '''
                     ORDER BY m.date;
                 '''
 
-RESULT_BY_EVENT = '''SELECT fide_id, player, nat, year, month, SUM(points) AS points, SUM(games) AS games
+RESULT_BY_EVENT = '''
+                    SELECT fide_id, player, nat, year, month, SUM(points) AS points, SUM(games) AS games
                     FROM(
-                    SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
-                        EXTRACT(YEAR FROM (age(e.start_date, p.born)) ) as year,
-                        EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
-                        SUM(CASE WHEN result = '1-0' THEN 1 
+                        SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
+                            EXTRACT(YEAR FROM (age(e.start_date, p.born)) ) as year,
+                            EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
+                            SUM(CASE WHEN result = '1-0' THEN 1 
                                  WHEN result = '½-½' THEN 0.5
                                  ELSE 0 END) AS points,
-                        COUNT(*) AS games
-                    FROM matches m
-                    JOIN players_new p ON m.white = p.fide_id
-                    JOIN events e ON m.event = e.event_id
-                    WHERE event = (%s)
-                    GROUP BY fide_id, player, nat, year, month
-                    UNION ALL
-                    SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
-                        EXTRACT(YEAR FROM (age(start_date, p.born)) ) as year,
-                        EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
-                        SUM(CASE WHEN result = '0-1' THEN 1
+                            COUNT(*) AS games
+                        FROM matches m
+                        JOIN players_new p ON m.white = p.fide_id
+                        JOIN events e ON m.event = e.event_id
+                        WHERE event = (%s)
+                        GROUP BY fide_id, player, nat, year, month
+
+                        UNION ALL
+
+                        SELECT p.fide_id AS fide_id, p.name AS player, p.nationality AS nat,
+                            EXTRACT(YEAR FROM (age(start_date, p.born)) ) as year,
+                            EXTRACT(MONTH FROM (age(start_date, p.born)) ) as month,
+                            SUM(CASE WHEN result = '0-1' THEN 1
                                  WHEN result = '½-½' THEN 0.5
                                  ELSE 0 END) AS points,
-                        COUNT(*) AS games
-                    FROM matches m
-                    JOIN players_new p ON m.black = p.fide_id
-                    JOIN events e ON m.event = e.event_id
-                    WHERE event = (%s)
-                    GROUP BY fide_id, black, nat, year, month
-                    ) AS sub
+                            COUNT(*) AS games
+                        FROM matches m
+                        JOIN players_new p ON m.black = p.fide_id
+                        JOIN events e ON m.event = e.event_id
+                        WHERE event = (%s)
+                        GROUP BY fide_id, black, nat, year, month
+                        ) AS sub
                     GROUP BY fide_id, player, nat, year, month
                     ORDER BY points DESC;
                     '''
