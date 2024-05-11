@@ -94,22 +94,6 @@ EVENT_BY_ID = '''
                 WHERE event_id = (%s)
                 '''
 
-RESULT_BYY_EVENT = """
-                    select tour.id as id, tour.name as name, site, tour.start_date, tour.end_date,
-                        extract(year from age(tour.start_date,players.born)) as years,
-                        extract(month from age(tour.start_date,players.born)) as months,
-                        elo,
-                        sum(result) as points,
-                        count(*) as games,
-                        round( avg(o_elo + 800 * result - 400) ) as performance
-                    FROM matches
-                        inner join tournaments tour on tour.short_name = matches.event
-                        inner join players on players.name = matches.player
-                        where players.id = ?
-                        group by player,event,elo,years,months,tour.id, tour.name, site, start_date, end_date
-                    order by round
-                    """
-
 IMPORT_CSV = '''
             TRUNCATE matches_old;
             COPY matches_old
