@@ -99,11 +99,11 @@
         <table id="myTable">
             <thead>
                 <tr class="stat">
-                    <th colspan="3"><a href="/event/{{ data[0]['event_id'] }}">{{ data[0].event_name }}</a></th>
-                    <th><a href="/{{ data[0].w_name }}">{{ data[0].w_name }}</a></th>
-                    <th>{{ data[0].w_nat }}</th>
-                    <th>{{ data[0].w_rating }}</th>
-                    <th>{{ data[0].w_year }}y {{ data[0].w_month }}m</th>
+                    <th colspan="3"><a href="/event/{{ data.event_id }}">{{ data.event_name }}</a></th>
+                    <th><a href="/{{ data.p_name }}">{{ data.p_name }}</a></th>
+                    <th>{{ data.p_nat }}</th>
+                    <th>{{ data.p_rating }}</th>
+                    <th>{{ data.p_year }}y {{ data.p_month }}m</th>
                     <th id="final"></th>
                     <th id="change"></th>
                 </tr>
@@ -122,15 +122,15 @@
                 </tr>
             </thead>
             <tbody>
-                {% for row in data %}
+                {% for row in data['matches'] %}
                 <tr>
                     <td>{{ row.date }}</td>
                     <td>{{ row.round }}</td>
                     <td>{{ row.color }}</td>
-                    <td><a href="/{{ row.b_name }}/{{ row.event_id }}">{{ row.b_name }}</a></td>
-                    <td>{{ row.b_nat }}</td>
-                    <td>{{ row.b_rating }}</td>
-                    <td>{{ row.b_year }}y {{ row.b_month }}m</td>
+                    <td><a href="/{{ row.o_name }}/{{ data.event_id }}">{{ row.o_name }}</a></td>
+                    <td>{{ row.o_nat }}</td>
+                    <td>{{ row.o_rating }}</td>
+                    <td>{{ row.o_year }}y {{ row.o_month }}m</td>
                     <td class="{% if row.result == '1-0' %}result-win{% elif row.result == '0-1' %}result-loss{% endif %}">{{ row.result }}</td>
                     <td class="count-me">{{ row.rat_change }}</td>
                 </tr>
