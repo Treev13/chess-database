@@ -8,9 +8,8 @@
     <style>
         body {
             font-family: Helvetica, sans-serif;
-            
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -18,7 +17,6 @@
         }
 
         h1 {
-
             color: #FFCC00;
         }
 
@@ -43,7 +41,6 @@
         }
 
         thead {
-            
             border: 2px solid #FAF5E9;
         }
 
@@ -65,7 +62,6 @@
             color: #ffcc00b6;
         }
     </style>
-
 </head>
 
 <body>
@@ -77,14 +73,18 @@
                     <th>Date</th>
                     <th>Name</th>
                     <th>Site</th>
+                    <th>Points</th>
+                    <th>Matches</th>
                 </tr>
             </thead>
             <tbody>
                 {% for event in events %}
                 <tr class="event">
                     <td class="event-date">{{ event.start }}</td>
-                    <td class="event-name"><a href="{{ name }}/{{ event.id }}">{{ event.name }}</a></td>
+                    <td class="event-name"><a href="/{{ event.id }}">{{ event.name }}</a></td>
                     <td>{{ event.site }}</td>
+                    <td>{{ event.points }}</td>
+                    <td>{{ event.matches }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
