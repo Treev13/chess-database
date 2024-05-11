@@ -81,7 +81,7 @@
             {% for result in results %}
             <tr>
                 <td>{{ result.fide_id }}</td>
-                <td>{{ result.player }}</td>
+                <td><a href="/{{ result['player'] }}/{{ event['event_id'] }}">{{ result.player }}</a></td>
                 <td>{{ result.nat }}</td>
                 <td>{{ result.rating }}</td>
                 <td>{{ result.year }}y{{ result.month }}m</td>
