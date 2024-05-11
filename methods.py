@@ -25,6 +25,7 @@ def get_rating_list_periods(cursor):
     return dates
 
 def get_rating (period, fide_id, cursor):
+    print(fide_id)
     cursor.execute('''
                 SELECT rating
                 FROM ratings
@@ -80,7 +81,9 @@ def calculate_result(id, cursor):
 
 def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
-    elvart = fide_calculator(diff)
+    if p_rat == 2000 or o_rat == 2000:
+        return 0
+    else: elvart = fide_calculator(diff)
     if result == '1-0': real = 1
     elif result == '0-1': real = 0
     else: real = 0.5
