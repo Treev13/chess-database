@@ -99,11 +99,11 @@
         <table id="myTable">
             <thead>
                 <tr class="stat">
-                    <th colspan="3"><a href="/event/{{ data[0]['event_id'] }}">{{ data[0]['event_name'] }}</a></th>
-                    <th>{{ data[0]['w_name'] }}</th>
-                    <th>{{ data[0]['w_nat'] }}</th>
-                    <th>{{ data[0]['w_rating'] }}</th>
-                    <th>{{ data[0]['w_year'] }}y {{ data[0]['w_month'] }}m</th>
+                    <th colspan="3"><a href="/event/{{ data[0]['event_id'] }}">{{ data[0].event_name }}</a></th>
+                    <th><a href="/{{ data[0].w_name }}">{{ data[0].w_name }}</a></th>
+                    <th>{{ data[0].w_nat }}</th>
+                    <th>{{ data[0].w_rating }}</th>
+                    <th>{{ data[0].w_year }}y {{ data[0].w_month }}m</th>
                     <th id="final"></th>
                     <th id="change"></th>
                 </tr>
@@ -124,18 +124,15 @@
             <tbody>
                 {% for row in data %}
                 <tr>
-                    <td>{{ row['date'] }}</td>
-                    <td>{{ row['round'] }}</td>
-                    <td>{{ row['color'] }}</td>
-                    <td><a href="/{{ row['b_name'] }}/{{ row['event_id'] }}">{{ row['b_name'] }}</a></td>
-                    <td>{{ row['b_nat'] }}</td>
-                    <td>{{ row['b_rating'] }}</td>
-                    <td>{{ row['b_year'] }}y {{ row['b_month'] }}m</td>
-                    <td
-                        class="{% if row['result'] == '1-0' %}result-win{% elif row['result'] == '0-1' %}result-loss{% endif %}">
-                        {{
-                        row['result'] }}</td>
-                    <td class="count-me">{{ row['rat_change'] }}</td>
+                    <td>{{ row.date }}</td>
+                    <td>{{ row.round }}</td>
+                    <td>{{ row.color }}</td>
+                    <td><a href="/{{ row.b_name }}/{{ row.event_id }}">{{ row.b_name }}</a></td>
+                    <td>{{ row.b_nat }}</td>
+                    <td>{{ row.b_rating }}</td>
+                    <td>{{ row.b_year }}y {{ row.b_month }}m</td>
+                    <td class="{% if row.result == '1-0' %}result-win{% elif row.result == '0-1' %}result-loss{% endif %}">{{ row.result }}</td>
+                    <td class="count-me">{{ row.rat_change }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -143,7 +140,7 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                updateSubTotal(); // Initial call
+                updateSubTotal();
 
                 function updateSubTotal() {
                     const table = document.getElementById("myTable");
