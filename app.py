@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import pandas as pd
-from methods import format_matches, get_events_by_player, file_upload_to_database, get_results_by_event, get_event_by_id
+from methods import get_matches_by_player_on_event, file_upload_to_database, get_results_by_event, get_event_by_id, get_infos_by_player_on_events
 from queries import PLAYERS, MATCHES_BY_PLAYER_AND_EVENT
 
 load_dotenv()
@@ -39,9 +39,9 @@ def get_players ():
 def events_by_player (name):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            events = get_events_by_player(name, cursor)
+            event_infos = get_infos_by_player_on_events(name, cursor)
 
-    return render_template('events_by_player.html', name=name, events=events)
+    return render_template('events_by_player.html', events=event_infos)
 
 @app.get('/event/<id>')
 def event_result (id):
@@ -55,10 +55,8 @@ def event_result (id):
 def matches (name, id):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(MATCHES_BY_PLAYER_AND_EVENT,(name, name, id)) 
-            data = cursor.fetchall()
-            mod_data = format_matches(name, id, data, cursor)
-    return render_template('matches.html', data=mod_data)
+            data = get_matches_by_player_on_event(name, id, cursor)
+    return render_template('matches.html', data=data)
 
 @app.get('/upload')
 def index():
