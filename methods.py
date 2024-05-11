@@ -1,47 +1,54 @@
 from datetime import timedelta
 from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID, RESULT_BY_EVENT, MATCHES_BY_PLAYER_AND_EVENT
 from fide_calculator import fide_calculator
+from database import connection
+from psycopg2.extras import RealDictCursor
 
 def check_latest_rating_list(match_date, periods):
     
     minimum = timedelta.max
-    final_date = periods[0]
-    for day in periods:
-        if (match_date - day) < minimum and (match_date - day) >= timedelta(0):
-            minimum = match_date - day
-            final_date = day
+    final_date = periods[0]['period']
+    for period in periods:
+        if (match_date - period['period']) < minimum and (match_date - period['period']) >= timedelta(0):
+            minimum = match_date - period['period']
+            final_date = period['period']
 
     return final_date
 
-def get_rating_list_periods(cursor):
-    cursor.execute('''
+def get_rating_list_periods():
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute('''
                 SELECT DISTINCT period as period
                 FROM ratings
                 ''')
-    data = cursor.fetchall()
-    dates = []
-    for row in data:
-        dates.append(row['period'])
-    return dates
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
 
-def get_rating (period, fide_id, cursor):
-    cursor.execute('''
-                SELECT rating, fed
-                FROM ratings
-                WHERE period = (%s)
-                    AND fide_id = (%s)
-                ''', (period, fide_id)) 
-    rating = cursor.fetchone()
+def get_rating (period, fide_id):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute('''
+                        SELECT rating, fed
+                        FROM ratings
+                        WHERE period = (%s)
+                            AND fide_id = (%s)
+                        ''', (period, fide_id)) 
+            rating = cursor.fetchone()
+            connection.commit()
+        cursor.close()
     return rating
 
 def format_matches(name, id, data, cursor):
     mod_data = []
-    periods = get_rating_list_periods(cursor)
+    periods = get_rating_list_periods()
     event = get_event_by_id(id, cursor)
     period = check_latest_rating_list(event['start_date'], periods)
     for row in data:
-        data_from_ratings_for_white = (get_rating(period, row['w_fide_id'], cursor))
-        data_from_ratings_for_black = (get_rating(period, row['b_fide_id'], cursor))
+        data_from_ratings_for_white = (get_rating(period, row['w_fide_id']))
+        data_from_ratings_for_black = (get_rating(period, row['b_fide_id']))
         row['w_rating'] = data_from_ratings_for_white['rating']
         row['w_nat'] = data_from_ratings_for_white['fed']
         row['b_rating'] = data_from_ratings_for_black['rating']
@@ -75,7 +82,6 @@ def get_infos_by_player_on_events(name, cursor):
         matches_on_event = get_matches_by_player_on_event(name, event['id'], cursor)
         stats_on_event = calculate_stats(matches_on_event)
         infos.append({'id': event['id'],'start': event['start'],'name': event['name'],'site': event['site'], 'points': stats_on_event['points'], 'matches': stats_on_event['matches']})
-    print(infos)
     
     return infos
 
@@ -92,12 +98,12 @@ def get_matches_by_player_on_event(name, id, cursor):
     return format_matches(name, id, data, cursor)
 
 def get_results_by_event(id, cursor):
-    periods = get_rating_list_periods(cursor)
+    periods = get_rating_list_periods()
     event = get_event_by_id(id, cursor)
     period = check_latest_rating_list(event['start_date'], periods)
     result = calculate_result(id, cursor)
     for row in result:
-        data_from_ratings = get_rating(period, row['fide_id'], cursor)
+        data_from_ratings = get_rating(period, row['fide_id'])
         row['rating'] = data_from_ratings['rating']
         row['nat'] = data_from_ratings['fed']
     return result
