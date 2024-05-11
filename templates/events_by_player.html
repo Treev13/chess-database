@@ -67,28 +67,35 @@
 <body>
     <div class="container">
         <h1>Tournaments</h1>
-        <table class="events-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Site</th>
-                    <th>Points</th>
-                    <th>Matches</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for event in events %}
-                <tr class="event">
-                    <td class="event-date">{{ event.start }}</td>
-                    <td class="event-name"><a href="/{{ event.id }}">{{ event.name }}</a></td>
-                    <td>{{ event.site }}</td>
-                    <td>{{ event.points }}</td>
-                    <td>{{ event.matches }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <section>{% for year in ('2010','2011') %}
+            <details>
+                <summary>{{year}}</summary>
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Site</th>
+                            <th>Points</th>
+                            <th>Matches</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events
+                            if event.start.strftime('%Y-%m-%d').startswith(year) %}
+                        <tr class="event">
+                            <td class="event-date">{{ event.start }}</td>
+                            <td class="event-name"><a href="{{name}}/{{ event.id }}">{{ event.name }}</a></td>
+                            <td>{{ event.site }}</td>
+                            <td>{{ event.points }}</td>
+                            <td>{{ event.matches }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </details>
+            {% endfor %}
+        </section>
     </div>
 </body>
 
