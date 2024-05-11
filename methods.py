@@ -1,5 +1,5 @@
 from datetime import timedelta
-from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID, RESULT_BY_EVENT
+from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID, RESULT_BY_EVENT, MATCHES_BY_PLAYER_AND_EVENT
 from fide_calculator import fide_calculator
 
 def check_latest_rating_list(match_date, periods):
@@ -25,15 +25,14 @@ def get_rating_list_periods(cursor):
     return dates
 
 def get_rating (period, fide_id, cursor):
-    print(fide_id)
     cursor.execute('''
-                SELECT rating
+                SELECT rating, fed
                 FROM ratings
                 WHERE period = (%s)
                     AND fide_id = (%s)
                 ''', (period, fide_id)) 
     rating = cursor.fetchone()
-    return rating['rating']
+    return rating
 
 def format_matches(name, id, data, cursor):
     mod_data = []
@@ -41,8 +40,12 @@ def format_matches(name, id, data, cursor):
     event = get_event_by_id(id, cursor)
     period = check_latest_rating_list(event['start_date'], periods)
     for row in data:
-        row['w_rating'] = (get_rating(period, row['w_fide_id'], cursor))
-        row['b_rating'] = (get_rating(period, row['b_fide_id'], cursor))
+        data_from_ratings_for_white = (get_rating(period, row['w_fide_id'], cursor))
+        data_from_ratings_for_black = (get_rating(period, row['b_fide_id'], cursor))
+        row['w_rating'] = data_from_ratings_for_white['rating']
+        row['w_nat'] = data_from_ratings_for_white['fed']
+        row['b_rating'] = data_from_ratings_for_black['rating']
+        row['b_nat'] = data_from_ratings_for_black['fed']
         if row['w_name'] != name:
 
             row['w_fide_id'], row['b_fide_id'] = row['b_fide_id'], row['w_fide_id']
@@ -65,13 +68,38 @@ def format_matches(name, id, data, cursor):
         mod_data.append(row)
     return mod_data
 
+def get_infos_by_player_on_events(name, cursor):
+    infos = []
+    events = get_events_by_player(name, cursor)
+    for event in events:
+        matches_on_event = get_matches_by_player_on_event(name, event['id'], cursor)
+        stats_on_event = calculate_stats(matches_on_event)
+        infos.append({'id': event['id'],'start': event['start'],'name': event['name'],'site': event['site'], 'points': stats_on_event['points'], 'matches': stats_on_event['matches']})
+    print(infos)
+    
+    return infos
+
+def calculate_stats(matches):
+    points = 0
+    for match in matches:
+        if match['result'] == '1-0': points += 1
+        elif match['result'] == '½-½': points += 0.5
+    return {'points': points, 'matches': len(matches)}
+
+def get_matches_by_player_on_event(name, id, cursor):
+    cursor.execute(MATCHES_BY_PLAYER_AND_EVENT,(name, name, id)) 
+    data = cursor.fetchall()
+    return format_matches(name, id, data, cursor)
+
 def get_results_by_event(id, cursor):
     periods = get_rating_list_periods(cursor)
     event = get_event_by_id(id, cursor)
     period = check_latest_rating_list(event['start_date'], periods)
     result = calculate_result(id, cursor)
     for row in result:
-        row['rating'] = get_rating(period, row['fide_id'], cursor)
+        data_from_ratings = get_rating(period, row['fide_id'], cursor)
+        row['rating'] = data_from_ratings['rating']
+        row['nat'] = data_from_ratings['fed']
     return result
 
 def calculate_result(id, cursor):
