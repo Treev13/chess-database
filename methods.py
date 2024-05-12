@@ -41,6 +41,16 @@ def get_rating (period, fide_id):
         cursor.close()
     return rating
 
+def get_matches_by_player_on_event(name, id, cursor):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(MATCHES_BY_PLAYER_AND_EVENT, (name, name, id)) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    formatted_matches = format_matches(name, data)
+    return add_rating_and_fed_to_matches(id, formatted_matches)
+
 def add_rating_and_fed_to_matches(id, data):
     final_data = dict()
     final_data['matches'] = []
@@ -101,22 +111,12 @@ def get_infos_by_player_on_events(name, cursor):
     
     return infos
 
-def calculate_stats(matches):
+def calculate_stats(event_by_player):
     points = 0
-    for match in matches:
+    for match in event_by_player['matches']:
         if match['result'] == '1-0': points += 1
         elif match['result'] == '½-½': points += 0.5
-    return {'points': points, 'matches': len(matches)}
-
-def get_matches_by_player_on_event(name, id, cursor):
-    with connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(MATCHES_BY_PLAYER_AND_EVENT, (name, name, id)) 
-            data = cursor.fetchall()
-            connection.commit()
-        cursor.close()
-    formatted_matches = format_matches(name, data)
-    return add_rating_and_fed_to_matches(id, formatted_matches)
+    return {'points': points, 'matches': len(event_by_player)}
 
 def get_results_by_event(id, cursor):
     periods = get_rating_list_periods()
@@ -138,11 +138,11 @@ def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
     if p_rat == 2000 or o_rat == 2000:
         return 0
-    else: elvart = fide_calculator(diff)
+    else: expected = fide_calculator(diff)
     if result == '1-0': real = 1
     elif result == '0-1': real = 0
     else: real = 0.5
-    return round(((real - elvart) * 10), 2)
+    return round(((real - expected) * 10), 2)
     
 
 def get_events_by_player(name, cursor):
