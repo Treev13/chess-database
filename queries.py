@@ -1,3 +1,14 @@
+PLAYERS = '''
+            SELECT p.fide_id, p.name, mr.max_rating, p.born
+            FROM players AS p
+            JOIN (
+                SELECT name, MAX(rating) AS max_rating
+                FROM ratings
+                GROUP BY name
+            ) AS mr ON mr.name = p.name
+            ORDER BY mr.max_rating DESC
+            LIMIT 200;
+        '''
 MATCHES_BY_PLAYER = '''
                     SELECT m.date as date, m.round as round,
                         w.fide_id as w_fide_id, w.name as w_name,
@@ -14,7 +25,7 @@ MATCHES_BY_PLAYER = '''
                     WHERE w.name = (%s) or b.name = (%s)
                     ORDER BY m.date;
                 '''
-MATCHES_BY_PLAYER_AND_EVENT = '''
+MATCHES_BY_PLAYER_ON_EVENT = '''
                     SELECT m.date as date, m.round as round,
                         w.fide_id as w_fide_id, w.name as w_name,
                         EXTRACT(YEAR FROM (age(m.date, w.born)) ) as w_year,
@@ -30,7 +41,6 @@ MATCHES_BY_PLAYER_AND_EVENT = '''
                         AND m.event = (%s)
                     ORDER BY m.round;
                 '''
-
 RESULT_BY_EVENT = '''
                     SELECT fide_id, player, year, month, SUM(points) AS points, SUM(games) AS games
                     FROM(
@@ -65,20 +75,6 @@ RESULT_BY_EVENT = '''
                     GROUP BY fide_id, player, year, month
                     ORDER BY points DESC;
                     '''
-
-PLAYERS = '''
-            SELECT p.fide_id, p.name, mr.max_rating, p.born
-            FROM players AS p
-            JOIN (
-                SELECT name, MAX(rating) AS max_rating
-                FROM ratings
-                GROUP BY name
-            ) AS mr ON mr.name = p.name
-            ORDER BY mr.max_rating DESC
-            LIMIT 200;
-        '''
-
-
 EVENTS_BY_PLAYER = '''
                     SELECT distinct e.event_id as id, e.start_date as start, e.event_name as name, e.event_site as site
                     FROM matches m
@@ -88,12 +84,20 @@ EVENTS_BY_PLAYER = '''
                     WHERE w.name = (%s) or b.name = (%s)
                     ORDER BY e.start_date
                     '''
-
 EVENT_BY_ID = '''
                 SELECT * FROM events
                 WHERE event_id = (%s)
                 '''
-
+INFO_FROM_RATINGS = '''
+                    SELECT rating, fed
+                    FROM ratings
+                    WHERE period = (%s)
+                        AND fide_id = (%s)
+                    '''
+DISTINCT_PERIODS = '''
+                SELECT DISTINCT period as period
+                FROM ratings
+                '''
 IMPORT_CSV = '''
             TRUNCATE matches_old;
             COPY matches_old
@@ -101,7 +105,6 @@ IMPORT_CSV = '''
             DELIMITER ','
             CSV HEADER;
         '''
-
 INSERT_EVENT = '''
                 INSERT INTO events (event_name, event_site, start_date, end_date, players_number)
                 SELECT "Event", "Site", MIN("Date"), MAX("Date"),
@@ -113,7 +116,6 @@ INSERT_EVENT = '''
                     )
                 GROUP BY "Event", "Site";
                 '''
-
 ADD_MATCHES = '''
                 INSERT INTO matches (date, event, round, white, black, result, moves, eco)
                 SELECT 

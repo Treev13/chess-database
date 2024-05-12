@@ -1,27 +1,55 @@
 from datetime import timedelta
-from queries import INSERT_EVENT, ADD_MATCHES, IMPORT_CSV, EVENTS_BY_PLAYER, EVENT_BY_ID, RESULT_BY_EVENT, MATCHES_BY_PLAYER_AND_EVENT
+from queries import *
 from fide_calculator import fide_calculator
 from database import connection
 from psycopg2.extras import RealDictCursor
 
+def get_players():
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(PLAYERS) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
+
+def get_matches_by_player_on_event(name, id):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(MATCHES_BY_PLAYER_ON_EVENT, (name, name, id)) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    formatted_matches = format_matches(name, data)
+    return add_rating_and_fed_to_matches(id, formatted_matches)
+
+def get_infos_by_player_on_events(name):
+    infos = []
+    events = get_events_by_player(name)
+    for event in events:
+        matches_on_event = get_matches_by_player_on_event(name, event['id'])
+        stats_on_event = calculate_stats(matches_on_event)
+        infos.append({'id': event['id'],
+                        'start': event['start'],
+                        'name': event['name'],
+                        'site': event['site'],
+                        'points': stats_on_event['points'],
+                        'matches': stats_on_event['matches']})
+    return infos
+
 def check_latest_rating_list(match_date, periods):
-    
     minimum = timedelta.max
     final_date = periods[0]['period']
     for period in periods:
         if (match_date - period['period']) < minimum and (match_date - period['period']) >= timedelta(0):
             minimum = match_date - period['period']
             final_date = period['period']
-
     return final_date
 
 def get_rating_list_periods():
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute('''
-                SELECT DISTINCT period as period
-                FROM ratings
-                ''')
+            cursor.execute(DISTINCT_PERIODS)
             data = cursor.fetchall()
             connection.commit()
         cursor.close()
@@ -30,26 +58,11 @@ def get_rating_list_periods():
 def get_rating (period, fide_id):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute('''
-                        SELECT rating, fed
-                        FROM ratings
-                        WHERE period = (%s)
-                            AND fide_id = (%s)
-                        ''', (period, fide_id)) 
+            cursor.execute(INFO_FROM_RATINGS, (period, fide_id)) 
             rating = cursor.fetchone()
             connection.commit()
         cursor.close()
     return rating
-
-def get_matches_by_player_on_event(name, id, cursor):
-    with connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(MATCHES_BY_PLAYER_AND_EVENT, (name, name, id)) 
-            data = cursor.fetchall()
-            connection.commit()
-        cursor.close()
-    formatted_matches = format_matches(name, data)
-    return add_rating_and_fed_to_matches(id, formatted_matches)
 
 def add_rating_and_fed_to_matches(id, data):
     final_data = dict()
@@ -79,7 +92,6 @@ def add_rating_and_fed_to_matches(id, data):
         match['result'] = row['result']
         match['rat_change'] = (calculate_fide(final_data['p_rating'], match['o_rating'], row['result']))
         final_data['matches'].append(match)
-    
     return final_data
 
 def format_matches(name, data):
@@ -101,16 +113,6 @@ def format_matches(name, data):
         mod_data.append(row)
     return mod_data
 
-def get_infos_by_player_on_events(name, cursor):
-    infos = []
-    events = get_events_by_player(name, cursor)
-    for event in events:
-        matches_on_event = get_matches_by_player_on_event(name, event['id'], cursor)
-        stats_on_event = calculate_stats(matches_on_event)
-        infos.append({'id': event['id'],'start': event['start'],'name': event['name'],'site': event['site'], 'points': stats_on_event['points'], 'matches': stats_on_event['matches']})
-    
-    return infos
-
 def calculate_stats(event_by_player):
     points = 0
     for match in event_by_player['matches']:
@@ -118,22 +120,26 @@ def calculate_stats(event_by_player):
         elif match['result'] == '½-½': points += 0.5
     return {'points': points, 'matches': len(event_by_player)}
 
-def get_results_by_event(id, cursor):
+def get_results_by_event(id):
     periods = get_rating_list_periods()
     event = get_event_by_id(id)
     period = check_latest_rating_list(event['start_date'], periods)
-    result = calculate_result(id, cursor)
+    result = calculate_result(id)
     for row in result:
         data_from_ratings = get_rating(period, row['fide_id'])
         row['rating'] = data_from_ratings['rating']
         row['nat'] = data_from_ratings['fed']
     return result
 
-def calculate_result(id, cursor):
-    cursor.execute(RESULT_BY_EVENT, (id, id))
-    return cursor.fetchall()
+def calculate_result(id):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(RESULT_BY_EVENT, (id, id))
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
     
-
 def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
     if p_rat == 2000 or o_rat == 2000:
@@ -144,10 +150,14 @@ def calculate_fide(p_rat, o_rat, result):
     else: real = 0.5
     return round(((real - expected) * 10), 2)
     
-
-def get_events_by_player(name, cursor):
-    cursor.execute(EVENTS_BY_PLAYER, (name, name))
-    return cursor.fetchall()
+def get_events_by_player(name):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(EVENTS_BY_PLAYER, (name, name))
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
 
 def get_event_by_id(id):
     with connection:
@@ -157,12 +167,6 @@ def get_event_by_id(id):
             connection.commit()
         cursor.close()
     return event
-
-def add_event(cursor):
-    cursor.execute(INSERT_EVENT)
-
-def load_matches(cursor):
-    cursor.execute(ADD_MATCHES)
 
 def file_upload_to_database(connection, session):
     with connection:
@@ -174,4 +178,11 @@ def file_upload_to_database(connection, session):
                 connection.commit()
             add_event(cursor)
             load_matches(cursor)
-            cursor.close()
+            connection.commit()
+        cursor.close()
+
+def add_event(cursor):
+    cursor.execute(INSERT_EVENT)
+
+def load_matches(cursor):
+    cursor.execute(ADD_MATCHES)
