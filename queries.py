@@ -1,10 +1,10 @@
 PLAYERS = '''
-            SELECT p.fide_id, p.name, mr.max_rating, p.born
+            SELECT p.fide_id, p.name, mr.fed, mr.max_rating, p.born
             FROM players AS p
             JOIN (
-                SELECT name, MAX(rating) AS max_rating
+                SELECT name, fed, MAX(rating) AS max_rating
                 FROM ratings
-                GROUP BY name
+                GROUP BY name, fed
             ) AS mr ON mr.name = p.name
             ORDER BY mr.max_rating DESC
             LIMIT 200;
