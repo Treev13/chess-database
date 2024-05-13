@@ -2,7 +2,7 @@ from datetime import timedelta
 from queries import *
 from fide_calculator import fide_calculator
 from database import connection
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, RealDictRow
 
 def get_players():
     with connection:
@@ -21,7 +21,7 @@ def get_matches_by_player_on_event(name, id):
             connection.commit()
         cursor.close()
     formatted_matches = format_matches(name, data)
-    return add_rating_and_fed_to_matches(id, formatted_matches)
+    return add_infos_to_matches(id, formatted_matches)
 
 def get_infos_by_player_on_events(name):
     infos = []
@@ -62,9 +62,9 @@ def get_rating (period, fide_id):
             rating = cursor.fetchone()
             connection.commit()
         cursor.close()
-    return rating
+    return rating if rating is not None else RealDictRow({'rating': 2000, 'fed': 'no'})
 
-def add_rating_and_fed_to_matches(id, data):
+def add_infos_to_matches(id, data):
     final_data = dict()
     final_data['matches'] = []
     event = get_event_by_id(id)
@@ -118,7 +118,7 @@ def calculate_stats(event_by_player):
     for match in event_by_player['matches']:
         if match['result'] == '1-0': points += 1
         elif match['result'] == '½-½': points += 0.5
-    return {'points': points, 'matches': len(event_by_player)}
+    return {'points': points, 'matches': len(event_by_player['matches'])}
 
 def get_results_by_event(id):
     periods = get_rating_list_periods()
@@ -168,7 +168,7 @@ def get_event_by_id(id):
         cursor.close()
     return event
 
-def file_upload_to_database(connection, session):
+def file_upload_to_database(session):
     with connection:
         with connection.cursor() as cursor:
             
