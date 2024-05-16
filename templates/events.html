@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+
+<body>
+    <h1>Events</h1>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Id</th>
+                    <th>Name</th>
+                    <th>Site</th>
+                    <th>Start</th>
+                    <th>Players</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.event_id }}</td>
+                    <td>
+                        <a href="/event/{{ row.event_id }}">
+                            {{ row.event_name }}
+                        </a>
+                    </td>
+                    <td>{{ row.event_site }}</td>
+                    <td>{{ row.start_date }}</td>
+                    <td>{{ row.players_number }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+{% endblock %}
+
+</html>

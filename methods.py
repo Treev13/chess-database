@@ -4,10 +4,10 @@ from fide_calculator import fide_calculator
 from database import connection
 from psycopg2.extras import RealDictCursor, RealDictRow
 
-def get_players():
+def get_list(list_name):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(PLAYERS) 
+            cursor.execute(eval(list_name)) 
             data = cursor.fetchall()
             connection.commit()
         cursor.close()

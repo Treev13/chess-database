@@ -9,6 +9,18 @@ PLAYERS = '''
             ORDER BY mr.max_rating DESC
             LIMIT 200;
         '''
+EVENTS = '''
+            SELECT *
+            FROM events
+            ORDER BY start_date;
+        '''
+RATINGS = '''
+            SELECT *
+            FROM ratings
+            WHERE period = '1991-01-01'
+            ORDER BY rating DESC
+            LIMIT 100;
+        '''
 MATCHES_BY_PLAYER = '''
                     SELECT m.date as date, m.round as round,
                         w.fide_id as w_fide_id, w.name as w_name,

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratings</title>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+
+<body>
+    <h1>Ratings</h1>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fide Id</th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Fed</th>
+                    <th>Rating</th>
+                    <th>Games</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.fide_id }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.title }}</td>
+                    <td>{{ row.fed }}</td>
+                    <td>{{ row.rating }}</td>
+                    <td>{{ row.games }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+{% endblock %}
+</html>
