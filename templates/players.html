@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            background-color: #009B4D;
+            margin: 0;
+            padding: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 20px 0px;
+        }
+
+        .row {
+            display: flex;
+            margin-left: -5px;
+            margin-right: -5px;
+        }
+
+        .column {
+            flex: 50%;
+            padding: 5px;
+        }
+
+
+        h1 {
+            padding-top: 3%;
+            padding-left: 5%;
+            color: #FFCC00;
+        }
+
+        table {
+            width: 95%;
+            border-collapse: collapse;
+            border: 2px solid #FAF5E9;
+            border-radius: 8px;
+            margin: 10px auto;
+            background-color: #009B4D;
+        }
+
+        th,
+        td {
+            color: #FAF5E9;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #FAF5E9;
+        }
+
+        th {
+            background-color: #009B4D;
+            font-weight: bold;
+        }
+
+        thead {
+            background-color: #009B4D;
+            font-weight: bold;
+            border: 2px solid #FAF5E9;
+        }
+
+
+        tr:nth-child(odd) {
+            background-color: #03b35b;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #FFCC00;
+        }
+
+        a:hover {
+            color: #ffcc00b6;
+        }
+    </style>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+
+<body>
+    <h1>Players</h1>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FIDE Id</th>
+                            <th>Name</th>
+                            <th>Fed</th>
+                            <th>Rating</th>
+                            <th>Birth Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data[::2] %}
+                        <tr>
+                            <td>{{ row.fide_id }}</td>
+                            <td>
+                                <a href="/{{ row.name }}">
+                                    {{ row.name }}
+                                </a>
+                            </td>
+                            <td>{{ row.fed }}</td>
+                            <td>{{ row.max_rating }}</td>
+                            <td>{{ row.born }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FIDE Id</th>
+                            <th>Name</th>
+                            <th>Fed</th>
+                            <th>Rating</th>
+                            <th>Birth Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data[1::2] %}
+                        <tr>
+                            <td>{{ row.fide_id }}</td>
+                            <td>
+                                <a href="/{{ row.name }}">
+                                    {{ row.name }}
+                                </a>
+                            </td>
+                            <td>{{ row.fed }}</td>
+                            <td>{{ row.max_rating }}</td>
+                            <td>{{ row.born }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
+
+</html>
