@@ -23,7 +23,7 @@
             border-radius: 8px;
             max-width: 90%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 20px 0px;
         }
 
         .row {
@@ -88,6 +88,8 @@
         }
     </style>
 </head>
+{% extends "layout.html" %}
+{% block content %}
 
 <body>
     <h1>Players</h1>
@@ -152,5 +154,6 @@
         </div>
     </div>
 </body>
+{% endblock %}
 
 </html>

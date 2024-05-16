@@ -90,12 +90,12 @@
             font-weight: bold;
         }
     </style>
-
 </head>
+{% extends "layout.html" %}
+{% block content %}
 
 <body>
     <div class="player-info">
-
         <table id="myTable">
             <thead>
                 <tr class="stat">
@@ -163,5 +163,6 @@
             });
         </script>
 </body>
+{% endblock %}
 
 </html>

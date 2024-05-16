@@ -8,6 +8,7 @@
     <style>
         body {
             font-family: Helvetica, sans-serif;
+            background-color: #009B4D;
         }
 
         .container {
@@ -18,6 +19,20 @@
 
         h1 {
             color: #FFCC00;
+            text-align: center;
+        }
+
+        summary {
+            background-color: #FFCC00;
+            border-radius: 40%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #009B4D;
+            padding: 5px;
+            margin: 10px 260px;
+            cursor: pointer;
+            outline: none;
         }
 
         .events-table {
@@ -63,11 +78,13 @@
         }
     </style>
 </head>
+{% extends "layout.html" %}
+{% block content %}
 
 <body>
     <div class="container">
-        <h1>Tournaments</h1>
-        <section>{% for year in ('2010','2011') %}
+        <h1>{{name}}</h1>
+        <section>{% for year in years %}
             <details>
                 <summary>{{year}}</summary>
                 <table class="events-table">
@@ -82,7 +99,7 @@
                     </thead>
                     <tbody>
                         {% for event in events
-                            if event.start.strftime('%Y-%m-%d').startswith(year) %}
+                        if event.start.strftime('%Y-%m-%d').startswith(year) %}
                         <tr class="event">
                             <td class="event-date">{{ event.start }}</td>
                             <td class="event-name"><a href="{{name}}/{{ event.id }}">{{ event.name }}</a></td>
@@ -98,5 +115,6 @@
         </section>
     </div>
 </body>
+{% endblock %}
 
 </html>
