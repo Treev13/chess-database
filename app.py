@@ -26,7 +26,9 @@ def get_main_data ():
 @app.get('/<name>')
 def events_by_player (name):
     event_infos = get_infos_by_player_on_events(name)
-    return render_template('events_by_player.html', name=name, events=event_infos)
+    distinct_years = set(str(event['start'].year) for event in event_infos)
+    years = sorted(list(distinct_years))
+    return render_template('events_by_player.html', name=name, events=event_infos, years=years)
 
 @app.get('/<name>/<id>')
 def matches (name, id):
@@ -51,7 +53,7 @@ def upload_file():
     session['uploaded_data_file_path'] = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if uploaded_file.filename != '':
         uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        file_upload_to_database(connection, session)
+        file_upload_to_database(session)
     return render_template('uploaded.html')
 
 @app.get('/show_data')
