@@ -13,6 +13,15 @@ def get_list(list_name):
         cursor.close()
     return data
 
+def get_rating_list(period):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(RATINGS, (period,)) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
+
 def get_matches_by_player_on_event(name, id):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:

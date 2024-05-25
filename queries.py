@@ -1,23 +1,35 @@
-PLAYERS = '''
+PLAYERS_ALL_TIME = '''
             SELECT p.fide_id, p.name, mr.fed, mr.max_rating, p.born
             FROM players AS p
             JOIN (
-                SELECT name, fed, MAX(rating) AS max_rating
+                SELECT name, STRING_AGG(DISTINCT fed,', ') AS fed, MAX(rating) AS max_rating
                 FROM ratings
-                GROUP BY name, fed
+                GROUP BY name
             ) AS mr ON mr.name = p.name
             ORDER BY mr.max_rating DESC
-            LIMIT 200;
+            LIMIT 100;
         '''
 EVENTS = '''
             SELECT *
             FROM events
+            where start_date > '2024-01-01'
             ORDER BY start_date;
+        '''
+PLAYERS = '''
+            SELECT p.fide_id, p.name, mr.fed, mr.rating, p.born
+            FROM players AS p
+            JOIN (
+                SELECT name, fed, rating
+                FROM ratings
+                WHERE period = '2024-05-01'
+            ) AS mr ON mr.name = p.name
+            ORDER BY mr.rating DESC
+            LIMIT 100;
         '''
 RATINGS = '''
             SELECT *
             FROM ratings
-            WHERE period = '1991-01-01'
+            WHERE period = (%s)
             ORDER BY rating DESC
             LIMIT 100;
         '''
@@ -109,6 +121,7 @@ INFO_FROM_RATINGS = '''
 DISTINCT_PERIODS = '''
                 SELECT DISTINCT period as period
                 FROM ratings
+                ORDER BY period
                 '''
 IMPORT_CSV = '''
             TRUNCATE matches_old;

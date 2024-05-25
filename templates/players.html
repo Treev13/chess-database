@@ -96,6 +96,7 @@
     <div class="container">
         <div class="row">
             <div class="column">
+                <h2>2024 May</h2>
                 <table>
                     <thead>
                         <tr>
@@ -107,7 +108,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in data[::2] %}
+                        {% for row in newest_data %}
                         <tr>
                             <td>{{ row.fide_id }}</td>
                             <td>
@@ -116,7 +117,7 @@
                                 </a>
                             </td>
                             <td>{{ row.fed }}</td>
-                            <td>{{ row.max_rating }}</td>
+                            <td>{{ row.rating }}</td>
                             <td>{{ row.born }}</td>
                         </tr>
                         {% endfor %}
@@ -124,6 +125,7 @@
                 </table>
             </div>
             <div class="column">
+                <h2>All Time</h2>
                 <table>
                     <thead>
                         <tr>
@@ -135,7 +137,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in data[1::2] %}
+                        {% for row in all_time_data %}
                         <tr>
                             <td>{{ row.fide_id }}</td>
                             <td>
