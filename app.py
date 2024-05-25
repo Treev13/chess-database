@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import pandas as pd
-from methods import get_list, get_infos_by_player_on_events, get_matches_by_player_on_event, get_results_by_event, get_event_by_id, file_upload_to_database
+from methods import *
 
 load_dotenv()
 
@@ -23,19 +23,27 @@ def index ():
     return render_template('index.html')
 
 @app.get('/players')
-def get_player_list ():
-    data = get_list('PLAYERS')
-    return render_template('players.html', data=data)
+def players ():
+    newest = get_list('PLAYERS')
+    all_time = get_list('PLAYERS_ALL_TIME')
+    return render_template('players.html', all_time_data=all_time, newest_data=newest)
 
 @app.get('/events')
-def get_event_list ():
+def events ():
     data = get_list('EVENTS')
     return render_template('events.html', data=data)
 
 @app.get('/ratings')
-def get_rating_list ():
-    data = get_list('RATINGS')
-    return render_template('ratings.html', data=data)
+def ratings ():
+    periods = get_rating_list_periods()
+    return render_template('ratings.html', periods=periods)
+
+@app.post("/ratings")
+def test():
+    select = request.form.get('ratings')
+    data = get_rating_list(select)
+    periods = get_rating_list_periods()
+    return render_template('ratings.html', data=data, periods=periods)
 
 @app.get('/<name>')
 def events_by_player (name):

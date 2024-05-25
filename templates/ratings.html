@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,17 @@
 
 <body>
     <h1>Ratings</h1>
+    <form action="" method="POST">
+        <label for="ratings">Rating periods:</label>
+
+        <select name="ratings" id="ratings">
+            <option value="blank">select</option>
+            {% for period in periods %}
+            <option value={{period.period}}>{{period.period}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Go</button>
+    </form>
     <div class="container">
         <table>
             <thead>
@@ -38,4 +50,5 @@
     </div>
 </body>
 {% endblock %}
+
 </html>
