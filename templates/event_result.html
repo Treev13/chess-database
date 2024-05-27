@@ -27,6 +27,12 @@
             margin: 10px auto;
             background-color: #009B4D;
         }
+        .stat th {
+            background-color: #FFCC00;
+            color: #009B4D;
+            font-weight: bolder;
+            font-size: large;
+        }
 
         th,
         td {
@@ -67,6 +73,15 @@
 {% block content %}
 <body>
     <table>
+        <thead>
+            <tr class="stat">
+                <th colspan="2">{{ event.event_name }}</th>
+                <th colspan="2">{{ event.event_site }}</th>
+                <th colspan="2">{{ event.start_date }} - {{ event.end_date }}</th>
+                <th>{{ event.players_number }} Players</th>
+                
+            </tr>
+        </thead>
         <thead>
             <tr>
                 <th>FIDE Id</th>
