@@ -22,6 +22,26 @@ def get_rating_list(period):
         cursor.close()
     return data
 
+def get_player_by_name(name):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(PLAYER_BY_NAME, (name,)) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    print(data)
+    return data[0]
+
+def get_ratings_by_player(name):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(RATINGS_BY_PLAYER, (name,)) 
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    print(data)
+    return data
+
 def get_matches_by_player_on_event(name, id):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:

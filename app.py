@@ -46,6 +46,14 @@ def test():
     return render_template('ratings.html', data=data, periods=periods)
 
 @app.get('/<name>')
+def player (name):
+    player_info = get_player_by_name(name)
+    ratings_data = get_ratings_by_player(name)
+    periods = [row['period'].strftime('%Y-%m') for row in ratings_data]
+    ratings = [row['rating'] for row in ratings_data]
+    return render_template('player.html', name=name, infos=player_info, ratings=ratings, periods=periods)
+
+@app.get('/<name>/events')
 def events_by_player (name):
     event_infos = get_infos_by_player_on_events(name)
     distinct_years = set(str(event['start'].year) for event in event_infos)

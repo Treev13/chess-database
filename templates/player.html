@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        main {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .player-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 300px;
+            text-align: center;
+        }
+
+        .player-card img {
+            width: 60%;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .player-card .info {
+            padding: 20px;
+        }
+
+        .player-card .info h2 {
+            margin: 10px 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .player-card .info p {
+            margin: 5px 0;
+            color: #777;
+        }
+
+        .player-card .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f8f8;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .player-card .stats div {
+            text-align: center;
+        }
+
+        .player-card .stats div p {
+            margin: 5px 0;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            width: 80%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+
+<body>
+    <main>
+        <div class="player-card">
+            <image src="{{url_for('static', filename='images/' + name + '.png')}}" alt="Player Image">
+                <div class="info">
+                    <h2>{{name}} - {{ratings[0].fed}}</h2>
+                    <p><a href="https://ratings.fide.com/profile/{{infos.fide_id}}">FIDE</a></p>
+                </div>
+                <div class="stats">
+                    <div>
+                        <p>Born</p>
+                        <small>{{infos.born}}</small>
+                    </div>
+                    <div>
+                        <p>GM</p>
+                        <small>{{infos.earn_gm}} for {{infos.gm_for}}</small>
+                    </div>
+                </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="myLineChart"></canvas>
+        </div>
+    </main>
+
+
+    <script>
+        // Data for the line chart
+        const data = {
+            labels: JSON.parse('{{ periods|tojson|safe }}'),
+        datasets: [{
+            label: 'Ratings',
+            data: JSON.parse('{{ ratings|tojson|safe }}'),
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+        };
+
+        // Configuration options
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Period'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Rating'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Render the line chart
+        window.onload = function () {
+            const ctx = document.getElementById('myLineChart').getContext('2d');
+            new Chart(ctx, config);
+        };
+    </script>
+</body>
+{% endblock %}
+
+</html>

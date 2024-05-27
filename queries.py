@@ -12,7 +12,7 @@ PLAYERS_ALL_TIME = '''
 EVENTS = '''
             SELECT *
             FROM events
-            where start_date > '2024-01-01'
+            where start_date between '2023-01-01' and '2024-12-31' and type = 'closed'
             ORDER BY start_date;
         '''
 PLAYERS = '''
@@ -26,12 +26,24 @@ PLAYERS = '''
             ORDER BY mr.rating DESC
             LIMIT 100;
         '''
+PLAYER_BY_NAME = '''
+            SELECT *
+            FROM players AS p
+            WHERE name = (%s);
+        '''
 RATINGS = '''
             SELECT *
             FROM ratings
             WHERE period = (%s)
             ORDER BY rating DESC
             LIMIT 100;
+        '''
+RATINGS_BY_PLAYER = '''
+            SELECT *
+            FROM ratings
+            WHERE name = (%s)
+              AND period > '2018-01-01'
+            ORDER BY period DESC;
         '''
 MATCHES_BY_PLAYER = '''
                     SELECT m.date as date, m.round as round,
@@ -105,7 +117,7 @@ EVENTS_BY_PLAYER = '''
                     JOIN events e on e.event_id = m.event
                     JOIN players w on w.fide_id = m.white
                     JOIN players b on b.fide_id = m.black
-                    WHERE w.name = (%s) or b.name = (%s)
+                    WHERE (w.name = (%s) or b.name = (%s)) AND e.type = 'closed'
                     ORDER BY e.start_date
                     '''
 EVENT_BY_ID = '''
