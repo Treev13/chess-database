@@ -27,6 +27,7 @@
             margin: 10px auto;
             background-color: #009B4D;
         }
+
         .stat th {
             background-color: #FFCC00;
             color: #009B4D;
@@ -71,15 +72,15 @@
 </head>
 {% extends "layout.html" %}
 {% block content %}
+
 <body>
-    <table>
+    <table id="myTable2">
         <thead>
             <tr class="stat">
                 <th colspan="2">{{ event.event_name }}</th>
                 <th colspan="2">{{ event.event_site }}</th>
                 <th colspan="2">{{ event.start_date }} - {{ event.end_date }}</th>
                 <th>{{ event.players_number }} Players</th>
-                
             </tr>
         </thead>
         <thead>
@@ -87,10 +88,10 @@
                 <th>FIDE Id</th>
                 <th>Name</th>
                 <th>Fed</th>
-                <th>Rating</th>
-                <th>Age</th>
-                <th>Points</th>
-                <th>Games</th>
+                <th onclick="sortTable(3)">Rating</th>
+                <th onclick="sortTable(4)">Age</th>
+                <th>Scores</th>
+                <th>Change</th>
             </tr>
         </thead>
         <tbody>
@@ -101,12 +102,49 @@
                 <td>{{ result.nat }}</td>
                 <td>{{ result.rating }}</td>
                 <td>{{ result.year }}y{{ result.month }}m</td>
-                <td>{{ result.points }}</td>
+                <td>{{ result.points }} / {{ result.games }}</td>
                 <td>{{ result.games }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable2");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 2; i < (rows.length - 1); i++) {
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML > y.innerHTML) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML < y.innerHTML) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 {% endblock %}
 
