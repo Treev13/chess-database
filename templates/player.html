@@ -12,7 +12,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 70vh;
             background-color: #f0f0f0;
             margin: 0;
         }
@@ -32,11 +32,11 @@
         }
 
         .player-card .info {
-            padding: 20px;
+            padding: 10px;
         }
 
         .player-card .info h2 {
-            margin: 10px 0;
+            margin: 5px 0;
             font-size: 24px;
             color: #333;
         }
@@ -68,6 +68,23 @@
             width: 80%;
             max-width: 800px;
         }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #333;
+            background-image: linear-gradient(to right, #ccc, #333, #ccc);
+            margin: 20px 0;
+        }
+
+        .event-date {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100vw;
+            text-align: center;
+        }
     </style>
 </head>
 {% extends "layout.html" %}
@@ -96,19 +113,27 @@
             <canvas id="myLineChart"></canvas>
         </div>
     </main>
+    <hr>
+    <div class="event-date">Events:
+        {% for year in years %}
+        <a href="/event/{{ name }}/{{ year.start }}">
+            <button>{{year.start}}</button>
+        </a>
+        {% endfor %}
+    </div>
 
 
     <script>
         // Data for the line chart
         const data = {
             labels: JSON.parse('{{ periods|tojson|safe }}'),
-        datasets: [{
-            label: 'Ratings',
-            data: JSON.parse('{{ ratings|tojson|safe }}'),
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }]
+            datasets: [{
+                label: 'Ratings',
+                data: JSON.parse('{{ ratings|tojson|safe }}'),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
         };
 
         // Configuration options
@@ -142,6 +167,7 @@
             new Chart(ctx, config);
         };
     </script>
+    
 </body>
 {% endblock %}
 

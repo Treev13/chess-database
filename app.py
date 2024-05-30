@@ -48,17 +48,16 @@ def test():
 @app.get('/<name>')
 def player (name):
     player_info = get_player_by_name(name)
+    years = get_event_years_by_player(name)
     ratings_data = get_ratings_by_player(name)
     periods = [row['period'].strftime('%Y-%m') for row in ratings_data]
     ratings = [row['rating'] for row in ratings_data]
-    return render_template('player.html', name=name, infos=player_info, ratings=ratings, periods=periods)
+    return render_template('player.html', name=name, infos=player_info, ratings=ratings, periods=periods, years=years)
 
-@app.get('/<name>/events')
-def events_by_player (name):
-    event_infos = get_infos_by_player_on_events(name)
-    distinct_years = set(str(event['start'].year) for event in event_infos)
-    years = sorted(list(distinct_years))
-    return render_template('events_by_player.html', name=name, events=event_infos, years=years)
+@app.get('/event/<name>/<year>')
+def events_by_player (name, year):
+    event_infos = get_infos_by_player_on_events(name, year)
+    return render_template('events_by_player.html', name=name, year=year, events=event_infos)
 
 @app.get('/<name>/<id>')
 def matches (name, id):

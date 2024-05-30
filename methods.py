@@ -52,9 +52,9 @@ def get_matches_by_player_on_event(name, id):
     formatted_matches = format_matches(name, data)
     return add_infos_to_matches(id, formatted_matches)
 
-def get_infos_by_player_on_events(name):
+def get_infos_by_player_on_events(name, year):
     infos = []
-    events = get_events_by_player(name)
+    events = get_events_by_player(name, year)
     for event in events:
         matches_on_event = get_matches_by_player_on_event(name, event['id'])
         stats_on_event = calculate_stats(matches_on_event)
@@ -179,10 +179,19 @@ def calculate_fide(p_rat, o_rat, result):
     else: real = 0.5
     return round(((real - expected) * 10), 2)
     
-def get_events_by_player(name):
+def get_events_by_player(name, year):
     with connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(EVENTS_BY_PLAYER, (name, name))
+            cursor.execute(EVENTS_BY_PLAYER, (name, name, year))
+            data = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return data
+
+def get_event_years_by_player(name):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(EVENT_YEARS_BY_PLAYER, (name, name))
             data = cursor.fetchall()
             connection.commit()
         cursor.close()

@@ -84,7 +84,7 @@
 <body>
     <div class="container">
         <h1>{{name}}</h1>
-        <section>{% for year in years %}
+        <section>
             <details>
                 <summary>{{year}}</summary>
                 <table class="events-table">
@@ -102,7 +102,7 @@
                         if event.start.strftime('%Y-%m-%d').startswith(year) %}
                         <tr class="event">
                             <td class="event-date">{{ event.start }}</td>
-                            <td class="event-name"><a href="{{name}}/{{ event.id }}">{{ event.name }}</a></td>
+                            <td class="event-name"><a href="/{{ name }}/{{ event.id }}">{{ event.name }}</a></td>
                             <td>{{ event.site }}</td>
                             <td>{{ event.points }}</td>
                             <td>{{ event.matches }}</td>
@@ -111,7 +111,6 @@
                     </tbody>
                 </table>
             </details>
-            {% endfor %}
         </section>
     </div>
 </body>
