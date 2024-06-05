@@ -12,7 +12,7 @@ PLAYERS_ALL_TIME = '''
 EVENTS = '''
             SELECT *
             FROM events
-            where start_date between '2022-01-01' and '2022-12-31' and type = 'closed'
+            where start_date between '2023-01-01' and '2023-12-31' and ready = 'ready'
             ORDER BY start_date;
         '''
 PLAYERS = '''
@@ -60,6 +60,23 @@ MATCHES_BY_PLAYER = '''
                     JOIN events e ON e.event_id = m.event
                     WHERE w.name = (%s) or b.name = (%s)
                     ORDER BY m.date;
+                '''
+MATCHES_BY_EVENT = '''
+                    SELECT white, black, result FROM matches
+                    WHERE event = (%s)
+                    ORDER BY round;
+                '''
+PLAYERS_ON_EVENT = '''
+                    SELECT id, name, born FROM
+                    (SELECT DISTINCT white AS id, p.name AS name, p.born AS born FROM matches AS m
+                    JOIN players AS p ON m.white = p.fide_id
+                    WHERE event = (%s)
+
+                    UNION ALL
+
+                    SELECT DISTINCT black AS id, p.name AS name, p.born AS born FROM matches AS m
+                    JOIN players AS p ON m.black = p.fide_id
+                    WHERE event = (%s)) AS sub;
                 '''
 MATCHES_BY_PLAYER_ON_EVENT = '''
                     SELECT m.date as date, m.round as round,
@@ -118,7 +135,7 @@ EVENTS_BY_PLAYER = '''
                     JOIN players w on w.fide_id = m.white
                     JOIN players b on b.fide_id = m.black
                     WHERE (w.name = (%s) or b.name = (%s))
-                        AND e.type = 'closed'
+                        AND e.ready = 'ready'
                         AND EXTRACT(YEAR FROM e.start_date) = (%s)
                     ORDER BY e.start_date;
                     '''
@@ -129,7 +146,7 @@ EVENT_YEARS_BY_PLAYER = '''
                     JOIN players w on w.fide_id = m.white
                     JOIN players b on b.fide_id = m.black
                     WHERE (w.name = (%s) or b.name = (%s))
-                        AND e.type = 'closed'
+                        AND e.ready = 'ready'
                     ORDER BY start;
                     '''
 EVENT_BY_ID = '''

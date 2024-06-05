@@ -1,8 +1,9 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from queries import *
 from fide_calculator import fide_calculator
 from database import connection
 from psycopg2.extras import RealDictCursor, RealDictRow
+from dateutil.relativedelta import relativedelta
 
 def get_list(list_name):
     with connection:
@@ -29,7 +30,6 @@ def get_player_by_name(name):
             data = cursor.fetchall()
             connection.commit()
         cursor.close()
-    print(data)
     return data[0]
 
 def get_ratings_by_player(name):
@@ -39,7 +39,6 @@ def get_ratings_by_player(name):
             data = cursor.fetchall()
             connection.commit()
         cursor.close()
-    print(data)
     return data
 
 def get_matches_by_player_on_event(name, id):
@@ -172,12 +171,12 @@ def calculate_result(id):
 def calculate_fide(p_rat, o_rat, result):
     diff = (p_rat - o_rat)
     if p_rat == 2000 or o_rat == 2000:
-        return 0
+        return 0, 0
     else: expected = fide_calculator(diff)
     if result == '1-0': real = 1
     elif result == '0-1': real = 0
     else: real = 0.5
-    return round(((real - expected) * 10), 2)
+    return round(((real - expected) * 10), 2), round(((real - expected) * 10), 2)*-1
     
 def get_events_by_player(name, year):
     with connection:
@@ -206,6 +205,15 @@ def get_event_by_id(id):
         cursor.close()
     return event
 
+def get_matches_by_event(event):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(MATCHES_BY_EVENT, (event,)) 
+            matches = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return matches
+
 def file_upload_to_database(session):
     with connection:
         with connection.cursor() as cursor:
@@ -224,3 +232,74 @@ def add_event(cursor):
 
 def load_matches(cursor):
     cursor.execute(ADD_MATCHES)
+
+def get_players_on_event_with_rating(id):
+    periods = get_rating_list_periods()
+    event = get_event_by_id(id)
+    period = check_latest_rating_list(event['start_date'], periods)
+    players = get_players_on_event(id)
+    players_with_rating = {}
+    for player in players:
+        info = get_rating(period, player['id'])
+        birthdate = player['born']
+        start = event['start_date']
+        year = relativedelta(start, birthdate).years
+        month = relativedelta(start, birthdate).months
+        players_with_rating[player['id']] = (player['name'], info['rating'], info['fed'], year, month)
+    return players_with_rating
+
+
+def get_players_on_event(id):
+    with connection:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(PLAYERS_ON_EVENT, (id, id)) 
+            players = cursor.fetchall()
+            connection.commit()
+        cursor.close()
+    return players
+
+
+def calculate_player_statistics(matches, players):
+    player_stats = {}
+    for player_id, (name, rating, fed, year, month) in players.items():
+        player_stats[str(player_id)] = {
+            'name': name,
+            'rating': rating,
+            'fed': fed,
+            'year': year,
+            'month': month,
+            'matches': 0,
+            'points': 0,
+            'change': 0
+        }
+
+    for match in matches:
+        white = match['white']
+        black = match['black']
+        result = match['result']
+        white_rating = players[white][1]
+        black_rating = players[black][1]
+
+        white_points, black_points = _calculate_points(result)
+        white_change, black_change = calculate_fide(white_rating, black_rating, result)
+
+        player_stats[str(white)]["matches"] += 1
+        player_stats[str(white)]["points"] += white_points
+        player_stats[str(white)]["change"] += white_change
+
+        player_stats[str(black)]["matches"] += 1
+        player_stats[str(black)]["points"] += black_points
+        player_stats[str(black)]["change"] += black_change
+
+    return player_stats
+
+def _calculate_points(result):
+    if result == '1-0':
+        return 1, 0
+    elif result == '0-1':
+        return 0, 1
+    elif result == '½-½':
+        return 0.5, 0.5
+    else:
+        return 0, 0
+

@@ -67,8 +67,11 @@ def matches (name, id):
 @app.get('/event/<id>')
 def event_result (id):
     event = get_event_by_id(id)
-    results = get_results_by_event(id)
-    return render_template('event_result.html', results=results, event=event)
+    matches = get_matches_by_event(id)
+    players = get_players_on_event_with_rating(id)
+    infos = calculate_player_statistics(matches, players)
+    #results = get_results_by_event(id)
+    return render_template('event_result.html', results=infos, event=event)
 
 @app.get('/upload')
 def upload():
